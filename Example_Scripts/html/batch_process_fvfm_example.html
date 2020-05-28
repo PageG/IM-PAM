@@ -1,0 +1,257 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Example script: batch-processing light-saturated FvFm data</title><meta name="generator" content="MATLAB 9.8"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-05-28"><meta name="DC.source" content="batch_process_fvfm_example.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Example script: batch-processing light-saturated FvFm data</h1><!--introduction--><p>Gerald Page 5/28/2020 <a href="https://pageg.github.io">https://pageg.github.io</a></p><p>All functions, data and example scripts are available here: <a href="https://github.com/PageG/IM-PAM">https://github.com/PageG/IM-PAM</a></p><p>This demonstration script process all images within a directory and calculates the mean and standard deviation of each image.</p><p>If you have multiple samples (i.e. pine needles) within each image, change second argument in the 'proc_single_PAM' function as required - see second example below.</p><p>If you want to to retain spatial data, see 'im_pam_tiff.m' or 'im_pam_tiff_fvfm.m' in the third example below.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Example 1:  calculate mean and standard deviation of one sample per image</a></li><li><a href="#2">Example 2: Process images with more than one sample per image</a></li><li><a href="#3">Example 3: retain spatial data and demonstrate 'seg_leaf' function</a></li></ul></div><h2 id="1">Example 1:  calculate mean and standard deviation of one sample per image</h2><pre class="codeinput"><span class="comment">% Get a list of all files to process</span>
+files = dir(<span class="string">'./IM-PAM/Data/single_images/'</span>);
+files = files(3:end);
+
+drs=[<span class="string">'./IM-PAM/Data/single_images/'</span>]; <span class="comment">% in current directory</span>
+images = dir([drs <span class="string">'/*.tif'</span>]); images = {images.name}; <span class="comment">% file names to cell</span>
+images = sort_nat(images); <span class="comment">% Sort images in numerical order. requires 'sort_nat' function in path</span>
+
+<span class="comment">% process single PAM images for light-saturated FvFm, calculating mean and</span>
+<span class="comment">% standard deviation.</span>
+<span class="keyword">for</span> k = 1:length(images)
+    [all_means(k,:), all_sd(k,:)] = proc_single_PAM([drs images{k}], 1); <span class="comment">% note second argument is the number of leaves within the image, set here = 1.</span>
+<span class="keyword">end</span>
+
+output = cell2table(images');
+output(:,2) = table(all_means);
+output(:,3) = table(all_sd);
+
+output.Properties.VariableNames = {<span class="string">'File'</span> <span class="string">'FvFm_mean'</span> <span class="string">'FvFm_sd'</span>}
+
+
+<span class="comment">% clear images all_means all_sd drs files images k;</span>
+
+<span class="comment">% writetable(output,'PAM_FvFm_example.csv');</span>
+</pre><pre class="codeoutput">
+output =
+
+  4&times;3 table
+
+       File       FvFm_mean    FvFm_sd 
+    __________    _________    ________
+
+    {'23.tif'}     0.70253     0.034196
+    {'24.tif'}     0.65912     0.025146
+    {'25.tif'}     0.70723     0.020259
+    {'26.tif'}     0.69477     0.021676
+
+</pre><h2 id="2">Example 2: Process images with more than one sample per image</h2><pre class="codeinput"><span class="comment">% in this example, each PAM image contains two needles from the same plant</span>
+
+files = dir(<span class="string">'./IM-PAM/Data/damaged_needles/'</span>);
+files = files(3:end);
+
+drs=[<span class="string">'./IM-PAM/Data/damaged_needles/'</span>]; <span class="comment">% in current directory</span>
+images = dir([drs <span class="string">'/*.tif'</span>]); images = {images.name}; <span class="comment">% file names to cell</span>
+images = sort_nat(images); <span class="comment">% Sort images in numerical order. requires 'sort_nat' function in path</span>
+
+<span class="comment">% process single PAM images for light-saturated FvFm, calculating mean and</span>
+<span class="comment">% standard deviation.</span>
+<span class="keyword">for</span> k = 1:length(images)
+    [all_means2(k,:), all_sd2(k,:)] = proc_single_PAM([drs images{k}], 2); <span class="comment">% 2 needles per image</span>
+<span class="keyword">end</span>
+
+output2 = cell2table(images');
+output2(:,2) = table(all_means2);
+output2(:,3) = table(all_sd2);
+
+output2.Properties.VariableNames = {<span class="string">'File'</span> <span class="string">'FvFm_mean'</span> <span class="string">'FvFm_sd'</span>}
+
+<span class="comment">% writetable(output2,'PAM_FvFm_duplicates_example.csv');</span>
+</pre><pre class="codeoutput">
+output2 =
+
+  4&times;3 table
+
+       File            FvFm_mean               FvFm_sd       
+    ___________    __________________    ____________________
+
+    {'24.tif' }    0.39609    0.51615    0.063361    0.095653
+    {'29.tif' }     0.6517    0.63162    0.056161    0.057852
+    {'120.tif'}    0.47754    0.50886     0.12644     0.12342
+    {'127.tif'}    0.15271    0.37514     0.11989    0.094099
+
+</pre><h2 id="3">Example 3: retain spatial data and demonstrate 'seg_leaf' function</h2><pre class="codeinput">[FvFm] = im_pam_tiff_fvfm([drs images{3}],134);
+
+<span class="comment">% PLOTTING</span>
+[nr,nc] = size(FvFm(:,:,1));
+<span class="comment">% subplot(1, 2, 2)</span>
+pcolor([FvFm nan(nr,1); nan(1,nc+1)]);
+shading <span class="string">flat</span>;
+set(gca, <span class="string">'ydir'</span>, <span class="string">'reverse'</span>);
+colorbar;
+title(<span class="string">'Light Saturated Fv/Fm of 120.tif'</span>);
+<span class="comment">% colormap hsv % jet, hsv</span>
+
+<span class="comment">% load segmented example figure</span>
+openfig(<span class="string">'segmented_120.fig'</span>);
+title(<span class="string">'Segmentation Example for 120.tif'</span>);
+</pre><img vspace="5" hspace="5" src="batch_process_fvfm_example_01.png" alt=""> <img vspace="5" hspace="5" src="batch_process_fvfm_example_02.png" alt=""> <p>Compare to RGB image</p><pre class="codeinput">im = imread(<span class="string">'120_zoom.jpg'</span>);
+imshow(im)
+title(<span class="string">'RGB scan of sample 120.tif'</span>)
+</pre><img vspace="5" hspace="5" src="batch_process_fvfm_example_03.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Example script: batch-processing light-saturated FvFm data
+% Gerald Page 5/28/2020
+% https://pageg.github.io
+%
+% All functions, data and example scripts are available here:
+% https://github.com/PageG/IM-PAM
+%
+% This demonstration script process all images within a directory and calculates the
+% mean and standard deviation of each image.
+%
+% If you have multiple samples (i.e. pine needles) within each image,
+% change second argument in the 'proc_single_PAM' function as required - see second
+% example below.
+% 
+% If you want to to retain spatial data, see 'im_pam_tiff.m' or
+% 'im_pam_tiff_fvfm.m' in the third example below.
+
+
+
+%% Example 1:  calculate mean and standard deviation of one sample per image
+
+% Get a list of all files to process
+files = dir('./IM-PAM/Data/single_images/');
+files = files(3:end);
+
+drs=['./IM-PAM/Data/single_images/']; % in current directory
+images = dir([drs '/*.tif']); images = {images.name}; % file names to cell
+images = sort_nat(images); % Sort images in numerical order. requires 'sort_nat' function in path
+
+% process single PAM images for light-saturated FvFm, calculating mean and
+% standard deviation.
+for k = 1:length(images)
+    [all_means(k,:), all_sd(k,:)] = proc_single_PAM([drs images{k}], 1); % note second argument is the number of leaves within the image, set here = 1.
+end
+
+output = cell2table(images');
+output(:,2) = table(all_means);
+output(:,3) = table(all_sd);
+
+output.Properties.VariableNames = {'File' 'FvFm_mean' 'FvFm_sd'}
+   
+    
+% clear images all_means all_sd drs files images k;
+
+% writetable(output,'PAM_FvFm_example.csv');
+
+%% Example 2: Process images with more than one sample per image
+
+% in this example, each PAM image contains two needles from the same plant
+
+files = dir('./IM-PAM/Data/damaged_needles/');
+files = files(3:end);
+
+drs=['./IM-PAM/Data/damaged_needles/']; % in current directory
+images = dir([drs '/*.tif']); images = {images.name}; % file names to cell
+images = sort_nat(images); % Sort images in numerical order. requires 'sort_nat' function in path
+
+% process single PAM images for light-saturated FvFm, calculating mean and
+% standard deviation.
+for k = 1:length(images)
+    [all_means2(k,:), all_sd2(k,:)] = proc_single_PAM([drs images{k}], 2); % 2 needles per image
+end
+
+output2 = cell2table(images');
+output2(:,2) = table(all_means2);
+output2(:,3) = table(all_sd2);
+
+output2.Properties.VariableNames = {'File' 'FvFm_mean' 'FvFm_sd'}
+   
+% writetable(output2,'PAM_FvFm_duplicates_example.csv');
+
+%% Example 3: retain spatial data and demonstrate 'seg_leaf' function
+
+[FvFm] = im_pam_tiff_fvfm([drs images{3}],134);
+
+% PLOTTING
+[nr,nc] = size(FvFm(:,:,1));
+% subplot(1, 2, 2)
+pcolor([FvFm nan(nr,1); nan(1,nc+1)]);
+shading flat;
+set(gca, 'ydir', 'reverse');
+colorbar;
+title('Light Saturated Fv/Fm of 120.tif');
+% colormap hsv % jet, hsv
+
+% load segmented example figure
+openfig('segmented_120.fig');
+title('Segmentation Example for 120.tif');
+
+%%
+% Compare to RGB image
+im = imread('120_zoom.jpg');
+imshow(im)
+title('RGB scan of sample 120.tif')
+##### SOURCE END #####
+--></body></html>
